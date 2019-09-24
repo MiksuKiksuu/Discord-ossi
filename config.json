@@ -1,0 +1,12 @@
+
+{ 
+	"token"  : "NTU5NzYwNzE4OTk2NzAxMTk0.D3ukTA.JSpBB48nh_ZHPP5JmQbEU1JHsvg",
+	"prefix" : ".",
+	"ossi_db" :
+  		{
+			"host"     : "localhost",
+			"user"     : "root",
+			"password" : "",
+			"database" : "ossi_db"
+		}
+}
