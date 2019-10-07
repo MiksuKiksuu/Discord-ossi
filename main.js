@@ -3,16 +3,61 @@ const bot = new Discord.Client({disableEveryone: true});
 const config = require("./config.json");
 const prefix = config.prefix;
 const fs = require("fs");
+const Client = require('ssh2').Client;
+const ssh = new Client();
+
+const mysql = require('mysql2');
 
 
-const mysql = require('mysql');
-const con = mysql.createConnection(config.ossi_db);
+const db = new Promise(function(resolve, reject){
+	ssh.on('ready', function() {
+	  ssh.forwardOut(
+	    // source address, this can usually be any valid address
+	    '127.0.0.1',
+	    // source port, this can be any valid port number
+	    12345,
+	    // destination address (localhost here refers to the SSH server)
+	    '127.0.0.1',
+	    // destination port
+	    3306,
+	    function (err, stream) {
+	      if (err) throw err; // SSH error: can also send error in promise ex. reject(err)
+	      // use `sql` connection as usual
+	      	connection = mysql.createConnection({
+	          host     : '127.0.0.1',
+	          user     : 'miklas.maczulskij',
+	          password : 'qwerty', 
+	          database : 'ossi_db',
+	          stream: stream
+	        });
 
-
-con.connect(function(error) {
-  if (error) throw error;
-  console.log("Connected!");
+	        // send connection back in variable depending on success or not
+		connection.connect(function(err){
+			if (err) {
+        resolve(connection);
+        console.log("SSH AND MYSQL Connected!");
+			} else {
+				reject(err);
+			}
+		});
+	  });
+	}).connect({
+	  host: 'it.esedu.fi',
+	  port: 22,
+	  username: 'miklas.maczulskij',
+	  password: 'KIki794613852'
+	});
 });
+
+module.exports = db;
+// const con = mysql.createConnection(config.ossi_db);
+
+
+// con.connect(function(error) {
+//   if (error) throw error;
+//   console.log("Connected!");
+// });
+
 
 bot.commands = new Discord.Collection();
 
@@ -43,7 +88,7 @@ bot.on('ready', async (message) => {
     setInterval(function () {
       console.log("Haettu uusi teemapäivä");
       let sql = `SELECT * FROM teemapaiva_ilmotus WHERE millon_näkyy_op = CURRENT_DATE()`;
-      let query = con.query(sql, (error, results, fields) => {
+      let query = connection.query(sql, (error, results, fields) => {
           if (error) throw error;
           Object.keys(results).forEach(function (key) {
               var row = results[key];
@@ -84,7 +129,7 @@ bot.on('ready', async (message) => {
                 JOIN user
                     ON teemapaiva_ilmottautuminen.uid=user.uid
                         WHERE millon_pidetään >= NOW() + INTERVAL 2 DAY`;
-    let query = con.query(sql, (error, results, fields) => {
+    let query = connection.query(sql, (error, results, fields) => {
         if (error) throw error;
         Object.keys(results).forEach(function (key) {
             var row = results[key];
