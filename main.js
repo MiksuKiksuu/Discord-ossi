@@ -59,6 +59,8 @@ module.exports = db;
 // });
 
 
+
+
 bot.commands = new Discord.Collection();
 
 fs.readdir("./commands/", (err, files) =>{
@@ -81,11 +83,13 @@ fs.readdir("./commands/", (err, files) =>{
 
 bot.on('ready', async (message) => {
   console.log(`Logged in as ${bot.user.tag}!`);
+
   try{
     let link = await bot.generateInvite(["ADMINISTRATOR"]);
     console.log(link);
-    //Hakee uusia teemapäiviä
+    // Hakee uusia teemapäiviä
     setInterval(function () {
+    
       console.log("Haettu uusi teemapäivä");
       let sql = `SELECT * FROM teemapaiva_ilmotus WHERE millon_näkyy_op = CURRENT_DATE()`;
       let query = connection.query(sql, (error, results, fields) => {
@@ -116,7 +120,7 @@ bot.on('ready', async (message) => {
 
 
 
-  }, 10000);// 86400000 (24h ms)
+  }, 1003400);// 86400000 (24h ms)
 //loppuu tähän
 //hakee tulevia teemapäiviä
   setInterval(function () {
@@ -156,8 +160,9 @@ bot.on('ready', async (message) => {
         });
     });
 
-  }, 10000);// 86400000 (24h ms)
+  }, 100343400);// 86400000 (24h ms)
   //Loppuu tässä
+
   } catch(e){
     console.log(e.stack);
   }
