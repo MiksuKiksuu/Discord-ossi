@@ -109,7 +109,7 @@ bot.on('ready', async (message) => {
               .addField("Ilmottautuminen loppuu", row.millon_pois_op.toLocaleDateString())
               .setTimestamp();
 
-              message.channel.send(embed);
+              message.send(embed);
 
 
           });
