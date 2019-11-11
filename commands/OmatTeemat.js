@@ -1,14 +1,14 @@
 const Discord = module.require("discord.js");
 const config = require("../config.json");
-const mysql = module.require('mysql');
-const con = mysql.createConnection(config.ossi_db);
+const mysql = module.require('../main.js');
+
 
 module.exports.run = async (bot, message, args) => {
 
     // Get users OSSI uid 
     let sql = `SELECT uid FROM user WHERE discord_id = '${message.author.id}'`;
 
-    con.query(sql, (error, result, fields) => {
+    connection.query(sql, (error, result, fields) => {
         
         let uid = null;
         
@@ -37,7 +37,7 @@ module.exports.run = async (bot, message, args) => {
               ON teemapaiva_ilmottautuminen.theme_id=teemapaiva_ilmotus.id 
               WHERE teemapaiva_ilmottautuminen.uid = ${uid} && millon_näkyy_op <= now() && millon_pois_op >= now()`;
 
-        con.query(sql, (error, result, fields) => {
+        connection.query(sql, (error, result, fields) => {
             if (error) throw error;
 
             console.log("Käyttäjälle " + uid + " löytyi " + result.length + " teemapäivää")
@@ -58,13 +58,17 @@ module.exports.run = async (bot, message, args) => {
                 var row = result[key];
 
                 let embed = new Discord.RichEmbed()
+                    .setTitle("Teemapäiväsi")
                     .setAuthor(row.aihe)
                     .setDescription(row.id)
+                    .setThumbnail('https://ossi.esedu.fi/assets/images/ossi-yay.png')
                     .setColor("#91234d")
-                    .addField("Teemapäivän aihe", `${row.teemapäivä_aihe}`)
-                    .addField("Pitäjä", row.pitäjä)
-                    .addField("Missä", row.missä);
-
+                    .addField("Teemapäivän aihe", row.aihe)
+                    .addField("Mitäjä", row.pitäjä)
+                    .addField("Missä", row.missä)
+                    .addField("Millon pidetään", row.millon_pidetään.toLocaleDateString())
+                    .addField("Ilmottautuminen loppuu", row.millon_pois_op.toLocaleDateString())
+                    .setTimestamp();
                 bot.users.get(`${message.author.id}`).send(embed);
 
             });

@@ -95,7 +95,6 @@ bot.on('ready', async (message) => {
 
               let embed = new Discord.RichEmbed()
 
-              .setTitle("testi")
               // .setURL('https://ossi.esedu.fi/theme_session/details/',`${row.id}`)
               .setAuthor(row.aihe)
               .setDescription('@everyone Uusi teemapäivä!!!')
@@ -109,7 +108,7 @@ bot.on('ready', async (message) => {
               .addField("Ilmottautuminen loppuu", row.millon_pois_op.toLocaleDateString())
               .setTimestamp();
 
-              message.send(embed);
+              bot.channels.get("611806075351465994").send(embed);
 
 
           });
@@ -133,7 +132,7 @@ bot.on('ready', async (message) => {
         if (error) throw error;
         Object.keys(results).forEach(function (key) {
             var row = results[key];
-            console.log(row);
+            // console.log(row);
 
             var d = row.millon_pidetään;
             var n = d.toLocaleDateString();
