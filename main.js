@@ -125,13 +125,13 @@ bot.on('ready', async (message) => {
 //hakee tulevia teemapäiviä
   setInterval(function () {
     console.log("Hakee Tulevia Teemapäiviä");
-    let sql = `SELECT teemapaiva_ilmotus.*, teemapaiva_ilmottautuminen.*, user.*
+    let sq2l = `SELECT teemapaiva_ilmotus.*, teemapaiva_ilmottautuminen.*, user.*
     FROM teemapaiva_ilmotus 
         JOIN teemapaiva_ilmottautuminen
             ON teemapaiva_ilmottautuminen.theme_id=teemapaiva_ilmotus.id
                 JOIN user
                     ON teemapaiva_ilmottautuminen.uid=user.uid
-                        WHERE millon_pidetään >= NOW() + INTERVAL 2 DAY`;
+                        WHERE teemapaiva_ilmottautuminen.notice = "" AND millon_pidetään >= NOW() + INTERVAL 2 DAY`;
     let query = connection.query(sql, (error, results, fields) => {
         if (error) throw error;
         Object.keys(results).forEach(function (key) {
@@ -143,7 +143,7 @@ bot.on('ready', async (message) => {
             console.log(n);
 
             let embed = new Discord.RichEmbed()
-            .setTitle("2pv päästä on teemapäivä")
+            .setTitle("OLE HILJAA TEE TÖITÄ")
             // .setURL('https://ossi.esedu.fi/theme_session/details/',`${row.id}`)
             .setAuthor(row.aihe)
             .setDescription('')
@@ -160,7 +160,7 @@ bot.on('ready', async (message) => {
         });
     });
 
-  }, 100343400);// 86400000 (24h ms)
+  }, 1000);// 86400000 (24h ms)
   //Loppuu tässä
 
   } catch(e){
