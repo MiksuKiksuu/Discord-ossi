@@ -5,6 +5,8 @@ const prefix = config.prefix;
 const fs = require("fs");
 const Client = require('ssh2').Client;
 const ssh = new Client();
+const schedule = require('node-schedule');
+
 
 const mysql = require('mysql2');
 
@@ -88,8 +90,7 @@ bot.on('ready', async (message) => {
     let link = await bot.generateInvite(["ADMINISTRATOR"]);
     console.log(link);
     // Hakee uusia teemapäiviä
-    setInterval(function () {
-    
+    var  searchingNewThemesSession= schedule.scheduleJob('22 11 */1 */1 *', function(){
       console.log("Haettu uusi teemapäivä");
       let sql = `SELECT * FROM teemapaiva_ilmotus WHERE millon_näkyy_op = CURRENT_DATE()`;
       let query = connection.query(sql, (error, results, fields) => {
@@ -117,50 +118,119 @@ bot.on('ready', async (message) => {
 
           });
       });
+    });
+  //   setInterval(function () {
+    
+  //     console.log("Haettu uusi teemapäivä");
+  //     let sql = `SELECT * FROM teemapaiva_ilmotus WHERE millon_näkyy_op = CURRENT_DATE()`;
+  //     let query = connection.query(sql, (error, results, fields) => {
+  //         if (error) throw error;
+  //         Object.keys(results).forEach(function (key) {
+  //             var row = results[key];
+
+  //             let embed = new Discord.RichEmbed()
+
+  //             // .setURL('https://ossi.esedu.fi/theme_session/details/',`${row.id}`)
+  //             .setAuthor(row.aihe)
+  //             .setDescription('@everyone Uusi teemapäivä!!!')
+  //             // .setAuthor(' ', 'https://ossi.esedu.fi/assets/images/ossi-yay.png', 'https://discord.js.org')
+  //             .setThumbnail('https://ossi.esedu.fi/assets/images/ossi-yay.png')
+  //             .setColor("#91234d")
+  //             .addField("Teemapäivän aihe", row.aihe)
+  //             .addField("Mitäjä", row.pitäjä)
+  //             .addField("Missä", row.missä)
+  //             .addField("Millon pidetään", row.millon_pidetään.toLocaleDateString())
+  //             .addField("Ilmottautuminen loppuu", row.millon_pois_op.toLocaleDateString())
+  //             .setTimestamp();
+
+  //             bot.channels.get("611806075351465994").send(embed);
+
+
+  //         });
+  //     });
 
 
 
-  }, 1003400);// 86400000 (24h ms)
+  // }, 1003400);// 86400000 (24h ms)
 //loppuu tähän
 //hakee tulevia teemapäiviä
-  setInterval(function () {
-    console.log("Hakee Tulevia Teemapäiviä");
-    let sq2l = `SELECT teemapaiva_ilmotus.*, teemapaiva_ilmottautuminen.*, user.*
-    FROM teemapaiva_ilmotus 
-        JOIN teemapaiva_ilmottautuminen
-            ON teemapaiva_ilmottautuminen.theme_id=teemapaiva_ilmotus.id
-                JOIN user
-                    ON teemapaiva_ilmottautuminen.uid=user.uid
-                        WHERE teemapaiva_ilmottautuminen.notice = "" AND millon_pidetään >= NOW() + INTERVAL 2 DAY`;
-    let query = connection.query(sql, (error, results, fields) => {
-        if (error) throw error;
-        Object.keys(results).forEach(function (key) {
-            var row = results[key];
-            // console.log(row);
 
-            var d = row.millon_pidetään;
-            var n = d.toLocaleDateString();
-            console.log(n);
+var  searchingThemesSession= schedule.scheduleJob('22 11 */1 */1 *', function(){
+  console.log("Hakee Tulevia Teemapäiviä");
+  let sql = `SELECT teemapaiva_ilmotus.*, teemapaiva_ilmottautuminen.*, user.*
+  FROM teemapaiva_ilmotus 
+      JOIN teemapaiva_ilmottautuminen
+          ON teemapaiva_ilmottautuminen.theme_id=teemapaiva_ilmotus.id
+              JOIN user
+                  ON teemapaiva_ilmottautuminen.uid=user.uid
+                      WHERE teemapaiva_ilmottautuminen.notice = "" AND millon_pidetään >= NOW() + INTERVAL 2 DAY`;
+  let query = connection.query(sql, (error, results, fields) => {
+      if (error) throw error;
+      Object.keys(results).forEach(function (key) {
+          var row = results[key];
+          // console.log(row);
 
-            let embed = new Discord.RichEmbed()
-            .setTitle("OLE HILJAA TEE TÖITÄ")
-            // .setURL('https://ossi.esedu.fi/theme_session/details/',`${row.id}`)
-            .setAuthor(row.aihe)
-            .setDescription('')
-            // .setAuthor(' ', 'https://ossi.esedu.fi/assets/images/ossi-yay.png', 'https://discord.js.org')
-            .setThumbnail('https://ossi.esedu.fi/assets/images/ossi-yay.png')
-            .setColor("#91234d")
-            .addField("Teemapäivän aihe", row.aihe)
-            .addField("Mitäjä", row.pitäjä)
-            .addField("Missä", row.missä)
-            .addField("Millon pidetään", row.millon_pidetään.toLocaleDateString())
-            .setTimestamp();
+          var d = row.millon_pidetään;
+          var n = d.toLocaleDateString();
+          console.log(n);
 
-            bot.users.get(row.discord_id).send(embed);
-        });
-    });
+          let embed = new Discord.RichEmbed()
+          .setTitle("OLE HILJAA TEE TÖITÄ")
+          // .setURL('https://ossi.esedu.fi/theme_session/details/',`${row.id}`)
+          .setAuthor(row.aihe)
+          .setDescription('')
+          // .setAuthor(' ', 'https://ossi.esedu.fi/assets/images/ossi-yay.png', 'https://discord.js.org')
+          .setThumbnail('https://ossi.esedu.fi/assets/images/ossi-yay.png')
+          .setColor("#91234d")
+          .addField("Teemapäivän aihe", row.aihe)
+          .addField("Mitäjä", row.pitäjä)
+          .addField("Missä", row.missä)
+          .addField("Millon pidetään", row.millon_pidetään.toLocaleDateString())
+          .setTimestamp();
 
-  }, 1000);// 86400000 (24h ms)
+          bot.users.get(row.discord_id).send(embed);
+      });
+  });
+});
+
+  // setInterval(function () {
+  //   console.log("Hakee Tulevia Teemapäiviä");
+  //   let sq2l = `SELECT teemapaiva_ilmotus.*, teemapaiva_ilmottautuminen.*, user.*
+  //   FROM teemapaiva_ilmotus 
+  //       JOIN teemapaiva_ilmottautuminen
+  //           ON teemapaiva_ilmottautuminen.theme_id=teemapaiva_ilmotus.id
+  //               JOIN user
+  //                   ON teemapaiva_ilmottautuminen.uid=user.uid
+  //                       WHERE teemapaiva_ilmottautuminen.notice = "" AND millon_pidetään >= NOW() + INTERVAL 2 DAY`;
+  //   let query = connection.query(sql, (error, results, fields) => {
+  //       if (error) throw error;
+  //       Object.keys(results).forEach(function (key) {
+  //           var row = results[key];
+  //           // console.log(row);
+
+  //           var d = row.millon_pidetään;
+  //           var n = d.toLocaleDateString();
+  //           console.log(n);
+
+  //           let embed = new Discord.RichEmbed()
+  //           .setTitle("OLE HILJAA TEE TÖITÄ")
+  //           // .setURL('https://ossi.esedu.fi/theme_session/details/',`${row.id}`)
+  //           .setAuthor(row.aihe)
+  //           .setDescription('')
+  //           // .setAuthor(' ', 'https://ossi.esedu.fi/assets/images/ossi-yay.png', 'https://discord.js.org')
+  //           .setThumbnail('https://ossi.esedu.fi/assets/images/ossi-yay.png')
+  //           .setColor("#91234d")
+  //           .addField("Teemapäivän aihe", row.aihe)
+  //           .addField("Mitäjä", row.pitäjä)
+  //           .addField("Missä", row.missä)
+  //           .addField("Millon pidetään", row.millon_pidetään.toLocaleDateString())
+  //           .setTimestamp();
+
+  //           bot.users.get(row.discord_id).send(embed);
+  //       });
+  //   });
+
+  // }, 1000);// 86400000 (24h ms)
   //Loppuu tässä
 
   } catch(e){
